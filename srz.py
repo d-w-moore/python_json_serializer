@@ -147,12 +147,18 @@ if __name__ == '__main__':
 
 #----+----+----+
 
+    @register
+    class Def:
+       pass
+
     @register_custom( dump_mode = deep_dumper )
     class Abc:
        i = 3
        def __init__(self, x=123 ): self.x=x
     
-    i0 = Abc()
+    i0 = Abc( [
+                 Def()
+            ] )
     xxx=(i0.dump())
     i1 = deep_factory (xxx)
     print (i0, i0.x, i1, i1.x)
