@@ -67,9 +67,13 @@ def register (cls, name = None, dump_mode = DumpMode.BASE):
     elif callable( dump_mode ):
         cls.dump = dump_mode
 #-->else depend on derived method to implement dump()
-    def ctor(cls,dct):
+    def Base_ctor(cls,dct):
         return cls(**dct)
-    cls.ctor = classmethod( ctor )
+    def Other_ctor(cls,dct):
+        inst = cls()
+        inst.__dict__.update(dct)
+        return inst
+    cls.ctor = classmethod(Base_ctor if issubclass(cls,Base) else Other_ctor)
     _cls_register(name or cls.__name__, cls)
     return cls
 
