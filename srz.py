@@ -29,8 +29,10 @@ def _cls_lookup( name, error_if_missing=False ):
 #===  API
 
 def deep_factory (obj):
-    if isinstance(obj, dict): return factory(obj,deep=True)
-    elif isinstance(obj, (list,tuple)): return memb.__class__ ( deep_factory(o) for o in obj )
+    if isinstance(obj, dict):
+        return factory(obj,deep=True)
+    elif isinstance(obj, (list,tuple)):
+        return memb.__class__ ( deep_factory(o) for o in obj )
     else: return obj
 
 def factory (obj, deep=False):
@@ -49,6 +51,9 @@ def factory (obj, deep=False):
 
 
 def deep_dumper (self):
+    if isinstance(self,(int,float,str)): return self
+    elif isinstance(self,(list,tuple)): return self.__class__(deep_dumper(i) for i in self)
+    elif isinstance(self,dict): return self.__class__( (k,deep_dumper(v)) for k,v in self.items() )
     dmp = self._dump()
     dct = dmp.values()[0]   # instance dictionary for iteration
     dct_ = dct.copy()       # dct_ into which sub-objects can be serialized if not JSON-dump compatible
