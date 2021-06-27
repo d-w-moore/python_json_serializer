@@ -29,17 +29,20 @@ def _cls_lookup( name, error_if_missing=False ):
 #===  API
 
 def deep_factory (obj):
-    if isinstance(obj, dict): return factory(dct,deep=True)
+    if isinstance(obj, dict): return factory(obj,deep=True)
     elif isinstance(obj, (list,tuple)): return memb.__class__ ( deep_factory(o) for o in obj )
     else: return obj
 
 def factory (obj, deep=False):
     xform = lambda o :deep_factory (o) if deep else o
     if type(obj) is dict:
-        clsname,inst_info = obj.items()[0]
-        cls = _cls_lookup( clsname )
+        cls = None
+        if len(obj) == 1:
+            clsname,inst_info = obj.items()[0]
+            cls = _cls_lookup( clsname )
         if cls is None:
-            return xform(obj)
+            return {k:xform(v) for k,v in obj.items()} # should expand normal dicts without
+                                                       # endless recursion
         else:
             return cls.ctor(xform( inst_info ))
     return obj
@@ -86,8 +89,6 @@ class Base(object):
 
 if __name__ == '__main__':
 
-    @register
-    class OtherClass(Base): pass
 
     @register_custom( dump_mode = DumpMode.DERIVED )
     class Derived_0(Base):
@@ -115,14 +116,16 @@ if __name__ == '__main__':
     class Bag(Base):
       pass
 
-    #derived = Derived_0(i=345)
+    @register
+    class OtherClass(Base): pass
+
     derived = Derived_0(i=OtherClass())
     dd = derived.dump()
     print( 'json.dump of derived ==> ',json.dumps(dd) )
     print('Derived_0 object dump() output:',dd)
 
     dcopy = factory(dd)
-    print('Reconstituted object: (node __repr__ has custom derived behavior', dcopy)
+    print('Reconstituted object: (note __repr__ has custom derived behavior', dcopy)
 
     b = Bag()
     b.attr1 = {'a':3}
@@ -141,5 +144,5 @@ if __name__ == '__main__':
     
     i0 = Abc()
     xxx=(i0.dump())
-    i1 = factory (xxx)
+    i1 = deep_factory (xxx)
     print (i0, i0.x, i1, i1.x)
