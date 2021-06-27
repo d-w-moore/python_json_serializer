@@ -32,7 +32,7 @@ def deep_factory (obj):
     if isinstance(obj, dict):
         return factory(obj,deep=True)
     elif isinstance(obj, (list,tuple)):
-        return memb.__class__ ( deep_factory(o) for o in obj )
+        return obj.__class__ ( deep_factory(o) for o in obj )
     else: return obj
 
 def factory (obj, deep=False):
