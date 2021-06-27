@@ -116,10 +116,6 @@ if __name__ == '__main__':
             return super(Derived_0,self).__repr__().replace(' ', ' ... ')
 
 
-    @register_custom(name = '__Bag_')
-    class Bag(Base):
-      pass
-
     @register
     class OtherClass(Base): pass
 
@@ -130,6 +126,11 @@ if __name__ == '__main__':
 
     dcopy = factory(dd)
     print('Reconstituted object: (note __repr__ has custom derived behavior', dcopy)
+
+
+    @register_custom(name = '__Bag_')
+    class Bag(Base):
+      pass
 
     b = Bag()
     b.attr1 = {'a':3}
